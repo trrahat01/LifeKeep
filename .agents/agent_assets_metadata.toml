@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Mxvgh0aXnBVH0j50UJEoO"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "lifevault app icon"
