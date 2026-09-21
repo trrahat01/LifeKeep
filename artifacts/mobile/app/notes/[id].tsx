@@ -14,7 +14,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { useApp, Note, ChecklistItem } from "@/context/AppContext";
+import { useApp, ItemColor, ChecklistItem } from "@/context/AppContext";
 import { useTheme } from "@/context/ThemeContext";
 import { ColorPicker } from "@/components/ColorPicker";
 import { generateId } from "@/lib/utils";
@@ -31,7 +31,7 @@ export default function NoteEditorScreen() {
 
   const [title, setTitle] = useState(existing?.title ?? "");
   const [desc, setDesc] = useState(existing?.description ?? "");
-  const [color, setColor] = useState(existing?.color ?? "purple");
+  const [color, setColor] = useState<ItemColor>(existing?.color ?? "purple");
   const [checklistMode, setChecklistMode] = useState(existing?.checklistMode ?? false);
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
     existing?.checklistItems ?? []
@@ -53,7 +53,7 @@ export default function NoteEditorScreen() {
       addNote({
         title: trimTitle || "Untitled",
         description: desc.trim(),
-        color: color as any,
+        color,
         favorite: false,
         category: "",
         pinned: false,
@@ -64,7 +64,7 @@ export default function NoteEditorScreen() {
       updateNote(existing.id, {
         title: trimTitle || "Untitled",
         description: desc.trim(),
-        color: color as any,
+        color,
         checklistMode,
         checklistItems,
       });

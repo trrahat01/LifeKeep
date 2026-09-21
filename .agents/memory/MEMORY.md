@@ -1,0 +1,1 @@
+- [React type boundaries](react-types-workspace-boundaries.md) — duplicate React type versions can make ref props incompatible across workspace package boundaries.

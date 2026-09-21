@@ -2,11 +2,11 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ITEM_COLORS, COLOR_KEYS } from "@/lib/utils";
-import { useTheme } from "@/context/ThemeContext";
+import type { ItemColor } from "@/context/AppContext";
 
 interface Props {
-  selected: string;
-  onSelect: (color: string) => void;
+  selected: ItemColor;
+  onSelect: (color: ItemColor) => void;
 }
 
 export function ColorPicker({ selected, onSelect }: Props) {
@@ -24,7 +24,7 @@ export function ColorPicker({ selected, onSelect }: Props) {
               { backgroundColor: dot },
               isSelected && styles.selected,
             ]}
-            onPress={() => onSelect(key)}
+            onPress={() => onSelect(key as ItemColor)}
           >
             {isSelected && <Feather name="check" size={12} color="#FFFFFF" />}
           </TouchableOpacity>
