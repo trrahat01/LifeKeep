@@ -3,7 +3,7 @@
     "name": "LifeKeep",
     "slug": "mobile",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,6 @@
     },
     "android": {
       "package": "com.mtcorestudio.lifekeep",
-      "enableProguardInReleaseBuilds": true,
       "permissions": [
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
@@ -55,7 +54,17 @@
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
+      "./plugins/withAndroidEdgeToEdge"
     ],
     "experiments": {
       "typedRoutes": true,
