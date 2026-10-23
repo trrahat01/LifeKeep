@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   tabRow: { flexDirection: "row", borderRadius: 14, padding: 4, gap: 2 },
   tabBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, paddingVertical: 10, borderRadius: 10 },
   tabLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
-  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 },
+  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 170 },
   card: {
     flexDirection: "row",
     alignItems: "center",

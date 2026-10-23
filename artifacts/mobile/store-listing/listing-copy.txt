@@ -1,0 +1,37 @@
+Google Play store listing
+
+App name
+LifeKeep
+
+Short description (77/80 characters)
+Notes, tasks, shopping lists, birthdays and important info, all in one place.
+
+Full description
+Keep everyday life organized with LifeKeep, an offline-first personal organizer for the things you want to remember.
+
+NOTES
+Write and organize notes. Pin or favorite important notes, use color tags and checklist-style notes, and search when you need something.
+
+TASKS & SHOPPING
+Keep to-do tasks with priorities and track completion. Build a shopping list and check items off as you shop.
+
+BIRTHDAYS & SAVED INFORMATION
+Save birthdays with countdowns, keep important information in a vault, and organize bookmarks for quick access.
+
+MADE FOR YOUR ROUTINE
+• Search across your notes and saved items
+• Choose a dark or light theme and accent color
+• Optional app lock with PIN or device biometrics
+• Export or share a backup from Settings
+
+YOUR DATA STAYS ON YOUR DEVICE
+LifeKeep stores organizer content locally on your device and does not require an account. The optional app lock adds an access barrier; it does not encrypt stored organizer data. Backups you share are handled by the app or service you choose.
+
+Store setup
+Application type: App
+Category: Productivity
+Suggested tags (choose up to five that appear in Play Console): Notebook, Calendar, Personal assistant, Productivity, Shopping
+Contact email: mtcorestudio@gmail.com
+Website: https://mtcorestudio.rf.gd
+Privacy policy: https://mtcorestudio.rf.gd/privacy/lifekeep-mvksoqkr
+External marketing: Off, if you want to opt out

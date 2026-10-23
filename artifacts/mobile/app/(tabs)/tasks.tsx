@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   progressText: { fontSize: 13, fontFamily: "Inter_400Regular" },
   progressTrack: { height: 6, borderRadius: 3, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 3 },
-  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 },
+  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 170 },
   todoRow: {
     flexDirection: "row",
     alignItems: "center",

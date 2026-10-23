@@ -1,6 +1,6 @@
-# LifeVault
+# LifeKeep
 
-A beautiful, offline-first personal organizer built with Expo React Native — notes, tasks, shopping lists, birthdays, secure vault, and bookmarks, all stored locally on-device.
+An offline-first personal organizer built with Expo React Native — notes, tasks, shopping lists, birthdays, secure vault, and bookmarks, all stored locally on-device.
 
 ## Run & Operate
 

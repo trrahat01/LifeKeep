@@ -61,7 +61,7 @@ export default function HomeScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: 170 }}
       >
         <LinearGradient
           colors={
@@ -77,7 +77,7 @@ export default function HomeScreen() {
                 {greeting}
               </Text>
               <Text style={[styles.appName, { color: colors.foreground }]}>
-                LifeVault
+                LifeKeep
               </Text>
             </View>
             <TouchableOpacity

@@ -9,6 +9,7 @@ import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/context/ThemeContext";
+import { AdBanner } from "@/components/AdBanner";
 
 function NativeTabLayout() {
   return (
@@ -46,13 +47,15 @@ function ClassicTabLayout() {
   const safeAreaInsets = useSafeAreaInsets();
 
   return (
-    <Tabs
+    <View style={{ flex: 1 }}>
+      <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
           position: "absolute",
+          bottom: Platform.OS === "android" ? 50 + safeAreaInsets.bottom : 0,
           backgroundColor: isIOS ? "transparent" : colors.background,
           borderTopWidth: isWeb ? 1 : 0,
           borderTopColor: colors.border,
@@ -137,7 +140,9 @@ function ClassicTabLayout() {
             ),
         }}
       />
-    </Tabs>
+      </Tabs>
+      {Platform.OS === "android" && <AdBanner />}
+    </View>
   );
 }
 

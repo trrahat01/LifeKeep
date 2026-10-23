@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   Alert,
   Platform,
   Share,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,7 +23,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme, AccentKey, ACCENT_PRIMARIES } from "@/context/ThemeContext";
 import { useApp } from "@/context/AppContext";
-import { exportAllData } from "@/lib/storage";
+import { exportAllData, importAllData } from "@/lib/storage";
+import { getLockSettings, saveLockSettings, hashPin, checkBiometricSupport, LockSettings } from "@/lib/security";
 
 const AnimTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -121,6 +125,64 @@ export default function SettingsScreen() {
 
   const totalItems = notes.length + todos.length + shoppingItems.length + birthdays.length + importantInfo.length + bookmarks.length;
 
+  const [lockSettings, setLockSettingsState] = useState<LockSettings>({
+    enabled: false,
+    useBiometrics: false,
+    pinHash: null,
+    autoLockDelay: 0,
+  });
+  const [bioSupport, setBioSupport] = useState({ hasHardware: false, isEnrolled: false });
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [newPin, setNewPin] = useState("");
+
+  React.useEffect(() => {
+    (async () => {
+      const s = await getLockSettings();
+      setLockSettingsState(s);
+      const bio = await checkBiometricSupport();
+      setBioSupport(bio);
+    })();
+  }, []);
+
+  const handleToggleAppLock = async () => {
+    if (!lockSettings.enabled) {
+      setNewPin("");
+      setShowPinModal(true);
+    } else {
+      const updated = { ...lockSettings, enabled: false, pinHash: null, useBiometrics: false };
+      setLockSettingsState(updated);
+      await saveLockSettings(updated);
+    }
+  };
+
+  const handleSavePin = async () => {
+    if (!/^\d{4}$/.test(newPin)) {
+      Alert.alert("Invalid PIN", "PIN must be 4 digits.");
+      return;
+    }
+    const hash = await hashPin(newPin);
+    const updated = { ...lockSettings, enabled: true, pinHash: hash };
+    setLockSettingsState(updated);
+    await saveLockSettings(updated);
+    setShowPinModal(false);
+    setNewPin("");
+    Alert.alert("App Lock Enabled", "LifeKeep is now protected with a 4-digit PIN.");
+  };
+
+  const handleToggleBiometrics = async () => {
+    if (!lockSettings.enabled) {
+      Alert.alert("Enable App Lock", "Set a PIN before enabling biometric authentication.");
+      return;
+    }
+    if (!bioSupport.hasHardware || !bioSupport.isEnrolled) {
+      Alert.alert("Biometrics unavailable", "Set up biometrics in your device settings first.");
+      return;
+    }
+    const updated = { ...lockSettings, useBiometrics: !lockSettings.useBiometrics };
+    setLockSettingsState(updated);
+    await saveLockSettings(updated);
+  };
+
   const handleExport = async () => {
     try {
       const data = await exportAllData();
@@ -128,7 +190,7 @@ export default function SettingsScreen() {
         Alert.alert("Exported", "Data exported to console.");
         console.log(data);
       } else {
-        await Share.share({ message: data, title: "LifeVault Export" });
+        await Share.share({ message: data, title: "LifeKeep Export" });
       }
     } catch {
       Alert.alert("Export failed");
@@ -166,7 +228,7 @@ export default function SettingsScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: 170 }}
       >
         <View style={[styles.header, { paddingTop: topPad + 12 }]}>
           <Text style={[styles.title, { color: colors.foreground }]}>Settings</Text>
@@ -182,7 +244,7 @@ export default function SettingsScreen() {
             <Feather name="shield" size={28} color={colors.primary} />
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileTitle, { color: colors.foreground }]}>LifeVault</Text>
+            <Text style={[styles.profileTitle, { color: colors.foreground }]}>LifeKeep</Text>
             <Text style={[styles.profileSub, { color: colors.mutedForeground }]}>
               {totalItems} items · Stored locally
             </Text>
@@ -235,9 +297,28 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>SECURITY</Text>
+          <SettingRow
+            icon="lock"
+            label="App Lock"
+            subtitle={lockSettings.enabled ? "Protected with PIN" : "Disable or enable PIN"}
+            onPress={handleToggleAppLock}
+            right={lockSettings.enabled && <Feather name="check" size={16} color={colors.primary} />}
+          />
+          <SettingRow
+            icon="shield"
+            label="Biometric Auth"
+            subtitle={lockSettings.useBiometrics ? "Enabled" : "Use Face ID/Touch ID"}
+            onPress={handleToggleBiometrics}
+            destructive={!lockSettings.useBiometrics && !bioSupport.isEnrolled}
+            right={lockSettings.useBiometrics && <Feather name="check" size={16} color={colors.primary} />}
+          />
+        </View>
+
+        <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>DATA</Text>
           <SettingRow icon="download" label="Export Data" subtitle="Share your data as JSON" onPress={handleExport} />
-          <SettingRow icon="info" label="About" subtitle="LifeVault v1.0 · Offline-first personal organizer" />
+          <SettingRow icon="info" label="About" subtitle="LifeKeep v1.0 · Offline-first personal organizer" />
         </View>
 
         <View style={styles.section}>
@@ -251,12 +332,76 @@ export default function SettingsScreen() {
           />
         </View>
       </ScrollView>
+      <Modal
+        visible={showPinModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowPinModal(false)}
+      >
+        <KeyboardAvoidingView
+          style={styles.modalBackdrop}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={[styles.pinModal, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.pinTitle, { color: colors.foreground }]}>Set app PIN</Text>
+            <Text style={[styles.pinSubtitle, { color: colors.mutedForeground }]}>
+              Choose a four-digit PIN to lock LifeKeep.
+            </Text>
+            <TextInput
+              style={[styles.pinInput, { color: colors.foreground, borderColor: colors.border }]}
+              value={newPin}
+              onChangeText={(value) => setNewPin(value.replace(/\D/g, "").slice(0, 4))}
+              keyboardType="number-pad"
+              secureTextEntry
+              maxLength={4}
+              autoFocus
+              accessibilityLabel="Four-digit app PIN"
+            />
+            <View style={styles.pinActions}>
+              <TouchableOpacity
+                style={[styles.pinAction, { borderColor: colors.border }]}
+                onPress={() => setShowPinModal(false)}
+              >
+                <Text style={{ color: colors.foreground }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.pinAction, { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                onPress={handleSavePin}
+              >
+                <Text style={{ color: "#FFF" }}>Enable lock</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+  },
+  pinModal: { padding: 24, borderRadius: 20, borderWidth: 1 },
+  pinTitle: { fontSize: 20, fontFamily: "Inter_700Bold", textAlign: "center" },
+  pinSubtitle: { fontSize: 14, fontFamily: "Inter_400Regular", textAlign: "center", marginTop: 8 },
+  pinInput: {
+    alignSelf: "center",
+    width: 180,
+    marginTop: 24,
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+    fontSize: 24,
+    letterSpacing: 12,
+    textAlign: "center",
+  },
+  pinActions: { flexDirection: "row", justifyContent: "flex-end", gap: 12, marginTop: 24 },
+  pinAction: { paddingVertical: 12, paddingHorizontal: 18, borderRadius: 10, borderWidth: 1 },
   header: { paddingHorizontal: 20, paddingBottom: 8 },
   title: { fontSize: 28, fontFamily: "Inter_700Bold" },
   profileCard: {

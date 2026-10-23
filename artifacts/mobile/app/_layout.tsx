@@ -9,11 +9,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AppLockGate } from "@/components/AppLockGate";
 import { AppProvider } from "@/context/AppContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -48,6 +50,16 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      import("react-native-google-mobile-ads")
+        .then(({ default: mobileAds }) => mobileAds().initialize())
+        .catch((error: unknown) => {
+          console.warn("Google Mobile Ads initialization failed:", error);
+        });
+    }
+  }, []);
+
   if (!fontsLoaded && !fontError) return null;
 
   return (
@@ -58,7 +70,9 @@ export default function RootLayout() {
             <AppProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <KeyboardProvider>
-                  <RootLayoutNav />
+                  <AppLockGate>
+                    <RootLayoutNav />
+                  </AppLockGate>
                 </KeyboardProvider>
               </GestureHandlerRootView>
             </AppProvider>
